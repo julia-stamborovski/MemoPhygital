@@ -1,38 +1,158 @@
-.App {
-  text-align: center;
+* {
+  padding:0;
+  margin: 0;
+  box-sizing: border-box;
 }
 
-.App-logo {
-  height: 40vmin;
+body {
+
+  display: flex;
+  padding-top: 10px;
+  align-items: center;
+  justify-content: center;
+  background-color: #191919;
+}
+.card {
+  background-color: #191919;
+  height: 200px;
+  width: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transform-style:preserve-3d ;
+  transition: 0.5s ease;
+}
+
+.card-img {
+  height: 190px;
+  width: 140px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.back {
+  background: url("./assets/card.png");
+  object-fit: cover;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 10px;
+  backface-visibility: hidden;
+  cursor:pointer;
+
+}
+
+.game-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  padding: 1rem;
+  perspective: 700px;
+
+}
+
+.card.open {
+  transform: rotateY(180deg);
+} 
+
+.stop-clicking {
   pointer-events: none;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.gameover {
+  background-color: rgba(0,0,0,0.0);
+  height: 100vh;
+  width: 100vw;
+  backdrop-filter: blur(20px);
+  position: absolute;
+  top:0;
+  left:0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.gameover-box {
+  max-width: 300px;
+  width: 100%;
+  height: 200px;
+  background-color: #000;
+  border-radius:10px;
+  color: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.logo {
+  margin-top: 2rem;
+  object-fit: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px auto;
+}
+ 
+
+.score-container {
+  display: flex;
+  justify-content: space-around;
+  gap: 10px;
+  align-items: center;
+  color: #9F9F9F;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.score-icon, .tries-icon
+{
+  margin-bottom: -0.4rem;
+  height: 2rem;
+  width: 2rem;
+
+}
+
+.points {
+  font-size: 1.4rem;
+}
+
+/* start screen style */
+.start-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+  justify-content: center; 
+  height: 100vh; 
+}
+
+.image-crocodile {
+  object-fit: cover;
+  height: 30rem;
+}
+
+.title-start {
+  background: linear-gradient(90deg, #FFF 3.87%, #636C19 33.66%, #FE70D1 62.67%, rgba(255, 255, 255, 0.82) 92.84%, #8493A6 97.1%);
+  background-clip: text;
+ -webkit-background-clip: text;
+ -webkit-text-fill-color: transparent;
+  text-align: center;
+}
+
+.button-start {
+  border-radius: 10px;
+  border: 1px solid #FFF;
+  background: #626262;
+  box-shadow: 0px 4px 4px 0px rgba(255, 255, 255, 0.25);
+  color: #FFFFFF;
+  align-items: center;
+  text-align: center;
+  padding: 1em 2rem;
+  margin-top: 0.5rem;
+  width: 20rem;
+  cursor: pointer;
 }
