@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Caveat&family=Inter:wght@500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lobster+Two&display=swap');
 
 * {
   padding:0;
@@ -181,8 +182,7 @@ a {
 .container-history {
   color: #fff;
   padding: 10px;
-  font-family: 'Caveat', cursive;
-
+  font-family: 'Lobster Two', sans-serif;
 }
 
 .title-history {
@@ -239,4 +239,31 @@ a {
   border: none;
   border-radius: 10px;
   cursor:pointer;
+}
+
+.loading {
+  height: 100vh;
+  width: 100vw;
+  background-image: url('https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExeXdldWJrZGh3NWFmaXZlZ2tkdm9nMTRqMmdjYTdvM2VmZnJ3cHUxYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/euUN4GQOGf9NJZqN72/giphy.gif');
+  background-position: center;
+  background-size: cover;
+}
+
+.loading-title {
+  text-align: center;
+}
+
+.container-leads {
+  background-image: url('https://media0.giphy.com/media/Qgfz2N36MgUBG/giphy.gif?cid=ecf05e477w0jv15ponxhaqgknkwljbh3frqoxgd1rge2v871&ep=v1_gifs_search&rid=giphy.gif&ct=g');
+  background-position: center;
+  background-size: cover;
+  width: 100vw;
+  color: #fff;
+  text-align: center;
+}
+
+.lead {
+  margin-top: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #ffffff61;  
 }

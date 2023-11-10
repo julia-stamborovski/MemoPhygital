@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import '../App.css';
 import { FIRESTORE_DB } from '../firebaseConfig.js';
 import { collection, getDocs } from 'firebase/firestore';
 
@@ -29,18 +30,18 @@ function PanelLeads() {
   }, []);
 
   return (
-    <div>
-      <h2>Leads:</h2>
+    <div className='container-leads'>
+      <h2 className='title-leads'>Leads</h2>
       <ul>
         {leads.map((lead) => (
-          <li key={lead.id}>
-            <strong>Name: {lead.name}</strong>
+          <li key={lead.id} className='lead'>
+            <strong>Nome: {lead.name}</strong>
             <br />
-            Email: {lead.email}
+            E-mail: {lead.email}
             <br />
-            Phone: {lead.phone}
+            Telefone: {lead.phone}
             <br />
-            score: {lead.score}
+            Score: {lead.score}
           </li>
         ))}
       </ul>

@@ -7,9 +7,11 @@ import GameOver from '../components/GameOver'
 import logo from '../assets/logo.png';
 import rating from '../assets/rating.svg';
 import flip from '../assets/flip.svg';
+
 import { useLocation } from 'react-router-dom';
-import { collection, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
-import { FIREBASE_APP, FIRESTORE_DB } from '../firebaseConfig.js'; // Certifique-se de importar sua configuração do Firebase Firestore
+import { collection, doc, setDoc } from 'firebase/firestore';
+import {FIRESTORE_DB } from '../firebaseConfig.js'; // Certifique-se de importar sua configuração do Firebase Firestore
+import Loading from '../components/Loading';
 
 function MemoryGame() {
   const location = useLocation();
@@ -47,6 +49,8 @@ function MemoryGame() {
   isMatch: false,
   }
  ]
+
+ const [loading, setLoading] = useState(true);
  const [cards, setCards] = useState([]);
  const [selectedCards, setSelectedCards] = useState([]);
  const [score, setScore] = useState(0);
@@ -63,12 +67,14 @@ function MemoryGame() {
   // shuffle
   .sort((a,b)=> .5 - Math.random());
   setCards(shuffledArray);
+  setTimeout(() => {
+    setLoading(false);
+  }, 10000); //10sec
  };
  useEffect(() => {
     if(score === arrayOfImages.length) {
       setTimeout(() => {
       shuffleImages();
-      setGameOver(true);
       },1000)
 
     }
@@ -87,7 +93,7 @@ function MemoryGame() {
 
  const checkMatch = () => {
   if (selectedCards[0].num === selectedCards[1].num){
-    console.log('uhu!!')
+    
     setScore((prev) => prev + 1)
     let updatedCards = cards.map((card) => {
       if(card.num ===  selectedCards[0].num) {
@@ -97,15 +103,15 @@ function MemoryGame() {
     })
     setCards(updatedCards);
   } else {
-    console.log('nao é o par...')
     setTries((prev) => prev + 1)
   }
   }
  
-  
   useEffect(() => {
     setTimeout(() => {
       shuffleImages();
+      setGameOver(false);
+      console.log(gameOver)
     }, 1000);
   }, []);
   
@@ -158,31 +164,42 @@ function MemoryGame() {
   
   
   return (
-  <>
-  {gameOver && <GameOver setTries={setTries} tries={tries} setGameOver={setGameOver} score={score} setScore={setScore}
-  message={message}
-
-/>}
-    <div className="container">
-        <img src={logo} className='logo' alt='logo'/>
-      <div className='score-container'>
-        <div className='score'>
-            <img src={rating} className='score-icon' alt='score'/> <span className='points'>{score}</span></div>
-            <p>Vamor ajudar o Clodo, {userData.name}!</p>
-        <div className='tries'><img src={flip} className='tries-icon' alt='tries'/> <span className='points'>{tries}</span></div>
-
-      </div>
-      <div className='game-container'>
-        {cards.map((card)=> (
-          <Card 
-          key={card.id}
-          card={card}
-          setSelectedCards={setSelectedCards}
-          selectedCards={selectedCards}
+    <>
+    {loading ? (
+      <Loading />
+    ) : (
+      <>
+        {gameOver && (
+          <GameOver
+            setTries={setTries}
+            tries={tries}
+            setGameOver={setGameOver}
+            score={score}
+            setScore={setScore}
+            message={message}
           />
-        ))}
-      </div>
-    </div>
+        )}
+        <div className="container">
+          <img src={logo} className="logo" alt="logo" />
+          <div className="score-container">
+            <div className="score">
+              <img src={rating} className="score-icon" alt="score" /> <span className="points">{score}</span>
+            </div>
+            <p>
+              Vamos ajudar o Clodo, {userData && userData.name ? userData.name : ''}! Faltam {20 - tries} tentativas
+            </p>
+            <div className="tries">
+              <img src={flip} className="tries-icon" alt="tries" /> <span className="points">{tries}</span>
+            </div>
+          </div>
+          <div className="game-container">
+            {cards.map((card) => (
+              <Card key={card.id} card={card} setSelectedCards={setSelectedCards} selectedCards={selectedCards} />
+            ))}
+          </div>
+        </div>
+      </>
+    )}
   </>
 )
 }
