@@ -6,6 +6,8 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import Lead from './screens/Lead';
+import History from './screens/History';
+import PanelLeads from './screens/PanelLeads';
 
 
 const router = createBrowserRouter([
@@ -20,6 +22,14 @@ const router = createBrowserRouter([
   {
     path: "/lead",
     element: <Lead />
+  },
+  {
+    path: "/historia",
+    element: <History />
+  },
+  {
+    path: "/painel-leads",
+    element: <PanelLeads />
   },
 ]);
 

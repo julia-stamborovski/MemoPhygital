@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { FIRESTORE_DB } from '../firebaseConfig.js';
 import { collection, doc, setDoc } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom'; // Importe useNavigate
+import '../App.css';
 
 function Lead() {
   const [formData, setFormData] = useState({
@@ -8,6 +10,8 @@ function Lead() {
     email: '',
     phone: '',
   });
+
+  const navigate = useNavigate(); // init hook useNavigate
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,7 +26,7 @@ function Lead() {
 
       await setDoc(leadsRef, formData);
 
-      // Limpar os campos do formulário
+// Limpando os dados do formulário
       setFormData({
         name: '',
         email: '',
@@ -31,11 +35,11 @@ function Lead() {
     } catch (error) {
       console.error('Erro ao adicionar lead: ', error);
     }
+    navigate('/memo', { state: formData }); // Use o hook navigate
   };
 
   return (
     <div className='lead-form'>
-      <h2>Formulário de Lead</h2>
       <form onSubmit={handleSubmit}>
         <input
           type="text"
@@ -64,7 +68,7 @@ function Lead() {
           required
         />
 
-        <button type="submit">Iniciar</button>
+        <button type="submit">Ajudar Clodo</button>
       </form>
     </div>
   );

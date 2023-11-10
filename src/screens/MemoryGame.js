@@ -7,9 +7,14 @@ import GameOver from '../components/GameOver'
 import logo from '../assets/logo.png';
 import rating from '../assets/rating.svg';
 import flip from '../assets/flip.svg';
-import party from '../assets/memoryImages/party.png';
+import { useLocation } from 'react-router-dom';
+import { collection, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { FIREBASE_APP, FIRESTORE_DB } from '../firebaseConfig.js'; // Certifique-se de importar sua configuração do Firebase Firestore
 
 function MemoryGame() {
+  const location = useLocation();
+  const userData = location.state; 
+
   let arrayOfImages = [
   {
     num: 1,
@@ -57,7 +62,6 @@ function MemoryGame() {
   .map((item, index)=>({ ...item, id:index+1 }))
   // shuffle
   .sort((a,b)=> .5 - Math.random());
-  setScore(0)
   setCards(shuffledArray);
  };
 
@@ -92,35 +96,54 @@ function MemoryGame() {
     setTries((prev) => prev + 1)
   }
   }
-
   useEffect(() => {
+    setTimeout(() => {
+      shuffleImages();
+    }, 1000);
+  }, []);
+  
+  useEffect(() => {
+    // Lógica do jogo, incluindo a verificação de correspondência, limite de tentativas, etc.
     const maxTries = 20; // Limite de 20 tentativas
   
     if (score === arrayOfImages.length) {
       setMessage('Parabéns! Você venceu!');
       setGameOver(true);
+     
+      if (!userData.email) {
+        console.error('Email do usuário não encontrado. Não é possível salvar o score.');
+        return;
+      }
+  
+      // Salvar o score na nova coleção "scores" quando o usuário vencer
+      const scoresCollectionRef = collection(FIRESTORE_DB, 'scores');
+      const newScoreDocRef = doc(scoresCollectionRef, userData.email); // email = ID do documento
+  
+      // Definindo os dados a serem salvos
+      const scoreData = {
+        name: userData.name,
+        email: userData.email,
+        score: score,
+      };
+  
+      setDoc(newScoreDocRef, scoreData)
+        .then(() => {
+          console.log('Score salvo com sucesso na coleção "scores"');
+        })
+        .catch((error) => {
+          console.error('Erro ao salvar o score na coleção "scores":', error);
+        });
+      
     } else if (tries >= maxTries) {
       setMessage('Você perdeu. Tente novamente.');
       setGameOver(true);
     }
-  }, [score, tries]);
+  }, [score, tries, arrayOfImages, setMessage, setGameOver, userData]);
   
-
-  // restart 
-
-  useEffect(() => {
-    if(score === arrayOfImages.length) {
-      setTimeout(() => {
-      shuffleImages();
-      setGameOver(true);
-      },1000)
-   
-    }
-  }, [score, shuffleImages])
-
+  
   return (
   <>
-  {gameOver && <GameOver setTries={setTries} tries={tries} setGameOver={setGameOver}
+  {gameOver && <GameOver setTries={setTries} tries={tries} setGameOver={setGameOver} score={score} setScore={setScore}
   message={message}
 
 />}
@@ -129,6 +152,7 @@ function MemoryGame() {
       <div className='score-container'>
         <div className='score'>
             <img src={rating} className='score-icon' alt='score'/> <span className='points'>{score}</span></div>
+            <p>Vamor ajudar o Clodo, {userData.name}!</p>
         <div className='tries'><img src={flip} className='tries-icon' alt='tries'/> <span className='points'>{tries}</span></div>
 
       </div>
