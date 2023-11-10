@@ -64,10 +64,15 @@ function MemoryGame() {
   .sort((a,b)=> .5 - Math.random());
   setCards(shuffledArray);
  };
-
  useEffect(() => {
-  shuffleImages();
- }, []);
+    if(score === arrayOfImages.length) {
+      setTimeout(() => {
+      shuffleImages();
+      setGameOver(true);
+      },1000)
+
+    }
+  }, [score, shuffleImages])
 
  useEffect(() => {
   console.log(selectedCards);
@@ -96,34 +101,39 @@ function MemoryGame() {
     setTries((prev) => prev + 1)
   }
   }
+ 
+  
   useEffect(() => {
     setTimeout(() => {
       shuffleImages();
     }, 1000);
   }, []);
   
+
+  const maxTries = 20; // Limite de 20 tentativas
+
   useEffect(() => {
     // Lógica do jogo, incluindo a verificação de correspondência, limite de tentativas, etc.
-    const maxTries = 20; // Limite de 20 tentativas
   
     if (score === arrayOfImages.length) {
       setMessage('Parabéns! Você venceu!');
       setGameOver(true);
-     
+  
       if (!userData.email) {
         console.error('Email do usuário não encontrado. Não é possível salvar o score.');
         return;
       }
   
-      // Salvar o score na nova coleção "scores" quando o usuário vencer
+      // Salvar o score na nova coleção "scores" apenas quando o usuário vencer
       const scoresCollectionRef = collection(FIRESTORE_DB, 'scores');
-      const newScoreDocRef = doc(scoresCollectionRef, userData.email); // email = ID do documento
+      const newScoreDocRef = doc(scoresCollectionRef, userData.email); // Use o email como ID do documento
   
       // Definindo os dados a serem salvos
       const scoreData = {
         name: userData.name,
         email: userData.email,
         score: score,
+        phone: userData.phone,
       };
   
       setDoc(newScoreDocRef, scoreData)
@@ -133,12 +143,18 @@ function MemoryGame() {
         .catch((error) => {
           console.error('Erro ao salvar o score na coleção "scores":', error);
         });
-      
-    } else if (tries >= maxTries) {
+    }
+  }, [score, userData]);
+  
+  useEffect(() => {
+    if (tries >= maxTries) {
       setMessage('Você perdeu. Tente novamente.');
       setGameOver(true);
+      setTimeout(() => {
+        shuffleImages();
+      }, 1000);
     }
-  }, [score, tries, arrayOfImages, setMessage, setGameOver, userData]);
+  }, [tries, maxTries, setMessage, setGameOver]);
   
   
   return (
