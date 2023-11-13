@@ -7,14 +7,15 @@ function PanelLeads() {
   const [leads, setLeads] = useState([]);
 
   useEffect(() => {
+    //busca dos leads no Firestore
     const fetchLeads = async () => {
       try {
-        const leadRef = collection(FIRESTORE_DB, 'scores');
+        const leadRef = collection(FIRESTORE_DB, 'scores'); //referência para a coleção 'scores' no Firestore
 
-        const snapshot = await getDocs(leadRef);
+        const snapshot = await getDocs(leadRef); //getDocs é usado para obter um snapshot da coleção
 
-        const leadsData = [];
-        snapshot.forEach((doc) => {
+        const leadsData = []; //Init array vazia que será utilizada para armazenar os dados dos leads.
+        snapshot.forEach((doc) => { //Itera sobre cada documento no snapshot e extrai os dados, adicionando-os à array leadsData
           leadsData.push({
             id: doc.id,
             ...doc.data(),

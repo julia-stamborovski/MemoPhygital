@@ -24,14 +24,15 @@ function Card({ card, setSelectedCards, selectedCards }) {
       };
 
     // o stop-clicking é para evitar do usuário encontrar a carta par clicando duas vezes na carta
-  return <div className={isFlipped?"card open stop-clicking" : "card"} onClick={handleClick}>
+  return  (
+  <div className={isFlipped?"card open stop-clicking" : "card"} onClick={handleClick}>
     <div className='front'>
         <img className='card-img' src={card.img} alt='' />
     </div>
     <div className='back'>
 
     </div>
-  </div>
+  </div>)
 }
 
 export default Card

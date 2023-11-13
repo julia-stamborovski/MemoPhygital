@@ -4,24 +4,23 @@ import { useEffect, useState } from "react";
 import Card from '../components/Card';
 import GameOver from '../components/GameOver'
 
-import logo from '../assets/logo.png';
 import rating from '../assets/rating.svg';
 import flip from '../assets/flip.svg';
 
 import { useLocation } from 'react-router-dom';
 import { collection, doc, setDoc } from 'firebase/firestore';
-import {FIRESTORE_DB } from '../firebaseConfig.js'; // Certifique-se de importar sua configuração do Firebase Firestore
+import {FIRESTORE_DB } from '../firebaseConfig.js'; 
 import Loading from '../components/Loading';
 
 function MemoryGame() {
   const location = useLocation();
   const userData = location.state; 
 
-  let arrayOfImages = [
+  let arrayOfImages = [   // lista de objetos com informações sobre as imagens
   {
-    num: 1,
-    img: 'https://cdna.artstation.com/p/assets/images/images/059/710/786/large/vipin-jacob-tator-gator-02.jpg?1676988379' ,
-    isMatch: false,
+    num: 1, // o num funciona igual um ID 
+    img: 'https://cdna.artstation.com/p/assets/images/images/059/710/786/large/vipin-jacob-tator-gator-02.jpg?1676988379' , // url da imagem
+    isMatch: false, // indicador de correspondência
   },
   {
     num: 2,
@@ -59,19 +58,20 @@ function MemoryGame() {
  const [message, setMessage] = useState(''); 
 
  
- const shuffleImages = () => {
-  // double array
+ const shuffleImages = () => {  //Embaralhar as imagens e configurar o estado
+  // Cria uma novo array duplicando as imagens e adicionando um ID único a cada item
   let shuffledArray = [...arrayOfImages, ...arrayOfImages]
-  // add id 
   .map((item, index)=>({ ...item, id:index+1 }))
-  // shuffle
+ // Embaralha a array usando o algoritmo de Fisher-Yates
   .sort((a,b)=> .5 - Math.random());
+// Define o estado das cartas com a array embaralhada
   setCards(shuffledArray);
   setTimeout(() => {
     setLoading(false);
-  }, 10000); //10sec
+  }, 3500); // 3.5sec
  };
- useEffect(() => {
+ useEffect(() => {   // lógica executada após a renderização inicial
+
     if(score === arrayOfImages.length) {
       setTimeout(() => {
       shuffleImages();
@@ -80,8 +80,7 @@ function MemoryGame() {
     }
   }, [score, shuffleImages])
 
- useEffect(() => {
-  console.log(selectedCards);
+ useEffect(() => {   //  lógica executada quando há alterações nas cartas selecionadas
   if(selectedCards.length === 2){
     setTimeout(() => {
       setSelectedCards([]);
@@ -91,10 +90,12 @@ function MemoryGame() {
  }, [selectedCards]);
 
 
- const checkMatch = () => {
+ const checkMatch = () => {   // lógica para verificar se as cartas selecionadas correspondem
   if (selectedCards[0].num === selectedCards[1].num){
-    
+    // Se as cartas correspondem, aumenta o score
     setScore((prev) => prev + 1)
+
+   // Atualiza o estado das cartas para indicar que são uma correspondência
     let updatedCards = cards.map((card) => {
       if(card.num ===  selectedCards[0].num) {
         return {...card, isMatch:true };
@@ -103,10 +104,12 @@ function MemoryGame() {
     })
     setCards(updatedCards);
   } else {
+   // Se as cartas não correspondem, aumenta o número de tentativas
     setTries((prev) => prev + 1)
   }
   }
- 
+
+  // Efeito para reiniciar o jogo após um intervalo
   useEffect(() => {
     setTimeout(() => {
       shuffleImages();
@@ -115,26 +118,19 @@ function MemoryGame() {
     }, 1000);
   }, []);
   
-
-  const maxTries = 20; // Limite de 20 tentativas
-
+  const maxTries = 20;  // Quantidade máxima de tentativas
   useEffect(() => {
-    // Lógica do jogo, incluindo a verificação de correspondência, limite de tentativas, etc.
   
-    if (score === arrayOfImages.length) {
-      setMessage('Parabéns! Você venceu!');
-      setGameOver(true);
-  
+    const saveScore = async () => {   // Verificar vitória ou derrota e salvar o score
+
       if (!userData.email) {
         console.error('Email do usuário não encontrado. Não é possível salvar o score.');
         return;
       }
   
-      // Salvar o score na nova coleção "scores" apenas quando o usuário vencer
       const scoresCollectionRef = collection(FIRESTORE_DB, 'scores');
-      const newScoreDocRef = doc(scoresCollectionRef, userData.email); // Use o email como ID do documento
+      const newScoreDocRef = doc(scoresCollectionRef, userData.email);
   
-      // Definindo os dados a serem salvos
       const scoreData = {
         name: userData.name,
         email: userData.email,
@@ -142,25 +138,30 @@ function MemoryGame() {
         phone: userData.phone,
       };
   
-      setDoc(newScoreDocRef, scoreData)
-        .then(() => {
-          console.log('Score salvo com sucesso na coleção "scores"');
-        })
-        .catch((error) => {
-          console.error('Erro ao salvar o score na coleção "scores":', error);
-        });
-    }
-  }, [score, userData]);
+      try {
+        await setDoc(newScoreDocRef, scoreData);
+        console.log('Score salvo com sucesso na coleção "scores"');
+      } catch (error) {
+        console.error('Erro ao salvar o score na coleção "scores":', error);
+      }
+    };
   
-  useEffect(() => {
-    if (tries >= maxTries) {
-      setMessage('Você perdeu. Tente novamente.');
-      setGameOver(true);
+    if (score === arrayOfImages.length) {
+      setMessage('Parabéns! Você venceu!');
       setTimeout(() => {
         shuffleImages();
+        setGameOver(true);
+      }, 1000);
+      saveScore();
+    } else if (tries >= maxTries) {
+      setMessage('Você perdeu. Tente novamente.');
+      saveScore(); 
+      setTimeout(() => {
+        shuffleImages();
+        setGameOver(true);
       }, 1000);
     }
-  }, [tries, maxTries, setMessage, setGameOver]);
+  }, [score, tries, userData, maxTries]);
   
   
   return (
@@ -180,7 +181,6 @@ function MemoryGame() {
           />
         )}
         <div className="container">
-          <img src={logo} className="logo" alt="logo" />
           <div className="score-container">
             <div className="score">
               <img src={rating} className="score-icon" alt="score" /> <span className="points">{score}</span>
